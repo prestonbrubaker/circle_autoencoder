@@ -81,7 +81,6 @@ def load_model(path, device):
 
 # Function to generate images with one varying latent variable
 def generate_scrolling_images(model, num_images, folder_path, scroll_index, constant_values, start=0.0, end=1.0):
-    os.makedirs(folder_path, exist_ok=True)
 
     # Linearly interpolate the value of the scrolling latent variable
     scroll_values = torch.linspace(start, end, steps=num_images)
