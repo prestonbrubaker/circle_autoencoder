@@ -139,7 +139,7 @@ for epoch in range(num_epochs):
         loss.backward()
         optimizer.step()
 
-    if epoch % 25 == 0:
+    if epoch % 1 == 0:
         print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.6f}')
         torch.save(model.state_dict(), f'variational_autoencoder.pth')
         print("Model Saved at Epoch: ", epoch)
