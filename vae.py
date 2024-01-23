@@ -5,8 +5,6 @@ from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
 from PIL import Image
 import os
-os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
-
 
 # Model Parameters
 latent_dim = 3  # Example latent space dimension
@@ -19,18 +17,17 @@ class VariationalAutoencoder(nn.Module):
 
         # Encoder
         self.encoder = nn.Sequential(
-            nn.Conv2d(1, 32, kernel_size=4, stride=2, padding=1),  # 128x128
+            nn.Conv2d(1, 32, kernel_size=4, stride=2, padding=1),  # Output: 32x128x128
             nn.ReLU(),
-            nn.Conv2d(32, 64, kernel_size=4, stride=2, padding=1),  # 64x64
+            nn.Conv2d(32, 64, kernel_size=4, stride=2, padding=1),  # Output: 64x64x64
             nn.ReLU(),
-            nn.Conv2d(64, 128, kernel_size=4, stride=2, padding=1),  # 32x32
+            nn.Conv2d(64, 128, kernel_size=4, stride=2, padding=1),  # Output: 128x32x32
             nn.ReLU(),
-            nn.Conv2d(128, 256, kernel_size=4, stride=2, padding=1),  # 16x16
+            nn.Conv2d(128, 256, kernel_size=4, stride=2, padding=1),  # Output: 256x16x16
             nn.ReLU(),
-            # Flatten the convolutional layer output
-            nn.Flatten(),
+            nn.Flatten(),  # Flatten for linear layer input
             nn.Linear(256*16*16, 1024),
-            nn.ReLU(),
+            nn.ReLU()
         )
 
         self.fc_mu = nn.Linear(1024, latent_dim)
@@ -42,21 +39,19 @@ class VariationalAutoencoder(nn.Module):
         self.decoder = nn.Sequential(
             nn.Linear(1024, 256*16*16),
             nn.ReLU(),
-            # Unflatten the layer to 256 channels with 16x16 image size
-            nn.Unflatten(1, (256, 16, 16)),
-            nn.ConvTranspose2d(256, 128, kernel_size=4, stride=2, padding=1),  # 32x32
+            nn.Unflatten(1, (256, 16, 16)),  # Unflatten to 256x16x16 for conv transpose input
+            nn.ConvTranspose2d(256, 128, kernel_size=4, stride=2, padding=1),  # Output: 128x32x32
             nn.ReLU(),
-            nn.ConvTranspose2d(128, 64, kernel_size=4, stride=2, padding=1),  # 64x64
+            nn.ConvTranspose2d(128, 64, kernel_size=4, stride=2, padding=1),  # Output: 64x64x64
             nn.ReLU(),
-            nn.ConvTranspose2d(64, 32, kernel_size=4, stride=2, padding=1),  # 128x128
+            nn.ConvTranspose2d(64, 32, kernel_size=4, stride=2, padding=1),  # Output: 32x128x128
             nn.ReLU(),
-            nn.ConvTranspose2d(32, 1, kernel_size=4, stride=2, padding=1),  # 256x256
+            nn.ConvTranspose2d(32, 1, kernel_size=4, stride=2, padding=1),  # Output: 1x256x256
             nn.Sigmoid()
         )
 
     def encode(self, x):
         x = self.encoder(x)
-        x = x.view(x.size(0), -1)
         mu = self.fc_mu(x)
         log_var = self.fc_log_var(x)
         return mu, log_var
@@ -68,8 +63,8 @@ class VariationalAutoencoder(nn.Module):
 
     def decode(self, z):
         x = self.decoder_input(z)
-        x = x.view(-1, 32, 256, 256)
-        return self.decoder(x)
+        x = self.decoder(x)
+        return x
 
     def forward(self, x):
         mu, log_var = self.encode(x)
@@ -122,7 +117,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = VariationalAutoencoder(latent_dim=LATENT_DIM).to(device)
 
 # Loss and optimizer
-optimizer = optim.Adam(model.parameters(), lr=0.0003, betas=(0.9, 0.999), eps=1e-8, weight_decay=0.00, amsgrad=False)
+optimizer = optim.Adam(model.parameters(), lr=0.00001, betas=(0.9, 0.999), eps=1e-8, weight_decay=0.00, amsgrad=False)
 
 # Train the model
 num_epochs = 100000
