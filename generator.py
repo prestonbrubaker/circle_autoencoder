@@ -101,7 +101,7 @@ LATENT_DIM = 3  # Update this if your latent dimension is different
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Load the trained model
-model_path = 'variational_autoencoder_final.pth'  # Update this path if necessary
+model_path = 'variational_autoencoder.pth' 
 vae_model = load_model(model_path, device)
 vae_model.eval()  # Set the model to evaluation mode
 
