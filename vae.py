@@ -68,7 +68,7 @@ class VariationalAutoencoder(nn.Module):
 
     def decode(self, z):
         x = self.decoder_input(z)
-        x = x.view(-1, 32, 40, 30)
+        x = x.view(-1, 32, 256, 256)
         return self.decoder(x)
 
     def forward(self, x):
