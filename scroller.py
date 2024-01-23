@@ -80,16 +80,19 @@ def load_model(path, device):
     return model
 
 # Function to generate images with one varying latent variable
-def generate_scrolling_images(model, num_images, folder_path, scroll_index, constant_values):
+def generate_scrolling_images(model, num_images, folder_path, scroll_index, constant_values, start=0.0, end=1.0):
     os.makedirs(folder_path, exist_ok=True)
 
-    for i in range(num_images):
+    # Linearly interpolate the value of the scrolling latent variable
+    scroll_values = torch.linspace(start, end, steps=num_images)
+
+    for i, scroll_value in enumerate(scroll_values):
         with torch.no_grad():
             # Create a latent vector with constant values
             latent_vector = torch.tensor(constant_values, dtype=torch.float32).unsqueeze(0).to(device)
 
             # Modify the latent variable that you want to scroll
-            latent_vector[0, scroll_index] = torch.randn(1).item()
+            latent_vector[0, scroll_index] = scroll_value.item()
 
             # Decode the latent vector
             generated_image = model.decode(latent_vector).cpu()
@@ -99,6 +102,7 @@ def generate_scrolling_images(model, num_images, folder_path, scroll_index, cons
             generated_image = transforms.ToPILImage()(generated_image)
             generated_image.save(os.path.join(folder_path, f"generated_image_{i+1}.png"))
 
+
 # Parameters
 LATENT_DIM = 3
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -107,9 +111,9 @@ vae_model = load_model(model_path, device)
 vae_model.eval()
 
 # Generate images
-num_generated_images = 50
+num_generated_images = 500
 scroll_index = 2  # Index of the latent variable to scroll
-constant_values = [0.0, 0, 0]  # Constants for other latent variables
+constant_values = [0.5, .5, .5]  # Constants for other latent variables
 generate_scrolling_images(vae_model, num_generated_images, 'generated_photos', scroll_index, constant_values)
 
 print(f"Generated {num_generated_images} scrolling images in 'generated_photos' folder.")
