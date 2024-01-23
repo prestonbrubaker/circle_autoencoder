@@ -109,7 +109,7 @@ vae_model.eval()
 # Generate images
 num_generated_images = 50
 scroll_index = 0  # Index of the latent variable to scroll
-constant_values = [0.0, -1.0, 1.0]  # Constants for other latent variables
+constant_values = [0.0, 0, 0]  # Constants for other latent variables
 generate_scrolling_images(vae_model, num_generated_images, 'generated_photos', scroll_index, constant_values)
 
 print(f"Generated {num_generated_images} scrolling images in 'generated_photos' folder.")
