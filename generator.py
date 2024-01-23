@@ -106,7 +106,7 @@ vae_model = load_model(model_path, device)
 vae_model.eval()  # Set the model to evaluation mode
 
 # Generate images
-num_generated_images = 50
+num_generated_images = 500
 generate_images(vae_model, num_generated_images, 'generated_photos')
 
 print(f"Generated {num_generated_images} images in 'generated_photos' folder.")
