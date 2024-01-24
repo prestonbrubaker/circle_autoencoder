@@ -134,6 +134,7 @@ for epoch in range(num_epochs):
         # Backward pass and optimize
         optimizer.zero_grad()
         loss.backward()
+        torch.nn.utils.clip_grad_value_(model.parameters(), clip_value=0.5)
         optimizer.step()
 
     if epoch % 1 == 0:
