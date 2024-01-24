@@ -110,7 +110,7 @@ transform = transforms.Compose([
 dataset = CustomDataset(folder_path='photos', transform=transform)
 
 # Dataset and Dataloader
-dataloader = DataLoader(dataset, batch_size=200, shuffle=True)
+dataloader = DataLoader(dataset, batch_size=24, shuffle=True)
 
 # Instantiate VAE model with latent_dim
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
