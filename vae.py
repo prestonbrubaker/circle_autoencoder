@@ -114,7 +114,7 @@ dataloader = DataLoader(dataset, batch_size=24, shuffle=True)
 
 # Instantiate VAE model with latent_dim
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print("Using: " + str(sevice))
+print("Using: " + str(device))
 model = VariationalAutoencoder(latent_dim=LATENT_DIM).to(device)
 
 # Loss and optimizer
