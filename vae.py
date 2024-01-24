@@ -69,7 +69,7 @@ class VariationalAutoencoder(nn.Module):
     def forward(self, x):
         mu, log_var = self.encode(x)
         z = self.reparameterize(mu, log_var)
-        return self.decode(z), mu, log_var
+        return self.decode(z), mu, log_var)
 
 def loss_function(recon_x, x, mu, log_var):
     BCE = nn.functional.binary_cross_entropy(recon_x, x, reduction='sum')
