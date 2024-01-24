@@ -17,36 +17,36 @@ class VariationalAutoencoder(nn.Module):
 
         # Encoder
         self.encoder = nn.Sequential(
-            nn.Conv2d(1, 32, kernel_size=4, stride=2, padding=1),  # Output: 32x128x128
+            nn.Conv2d(1, 3, kernel_size=4, stride=2, padding=1),  # Output: 3x128x128
             nn.ReLU(),
-            nn.Conv2d(32, 64, kernel_size=4, stride=2, padding=1),  # Output: 64x64x64
+            nn.Conv2d(3, 9, kernel_size=4, stride=2, padding=1),  # Output: 9x64x64
             nn.ReLU(),
-            nn.Conv2d(64, 128, kernel_size=4, stride=2, padding=1),  # Output: 128x32x32
+            nn.Conv2d(9, 27, kernel_size=4, stride=2, padding=1),  # Output: 27x32x32
             nn.ReLU(),
-            nn.Conv2d(128, 256, kernel_size=4, stride=2, padding=1),  # Output: 256x16x16
+            nn.Conv2d(27, 27, kernel_size=4, stride=2, padding=1),  # Output: 27x16x16
             nn.ReLU(),
             nn.Flatten(),  # Flatten for linear layer input
-            nn.Linear(256*16*16, 1024),
+            nn.Linear(27*16*16, 256),
             nn.ReLU()
         )
 
-        self.fc_mu = nn.Linear(1024, latent_dim)
-        self.fc_log_var = nn.Linear(1024, latent_dim)
+        self.fc_mu = nn.Linear(256, latent_dim)
+        self.fc_log_var = nn.Linear(256, latent_dim)
 
         # Decoder
-        self.decoder_input = nn.Linear(latent_dim, 1024)
+        self.decoder_input = nn.Linear(latent_dim, 256)
 
         self.decoder = nn.Sequential(
-            nn.Linear(1024, 256*16*16),
+            nn.Linear(256, 27*16*16),
             nn.ReLU(),
-            nn.Unflatten(1, (256, 16, 16)),  # Unflatten to 256x16x16 for conv transpose input
-            nn.ConvTranspose2d(256, 128, kernel_size=4, stride=2, padding=1),  # Output: 128x32x32
+            nn.Unflatten(1, (27, 16, 16)),  # Unflatten to 256x16x16 for conv transpose input
+            nn.ConvTranspose2d(27, 27, kernel_size=4, stride=2, padding=1),  # Output: 27x32x32
             nn.ReLU(),
-            nn.ConvTranspose2d(128, 64, kernel_size=4, stride=2, padding=1),  # Output: 64x64x64
+            nn.ConvTranspose2d(27, 9, kernel_size=4, stride=2, padding=1),  # Output: 9x64x64
             nn.ReLU(),
-            nn.ConvTranspose2d(64, 32, kernel_size=4, stride=2, padding=1),  # Output: 32x128x128
+            nn.ConvTranspose2d(9, 3, kernel_size=4, stride=2, padding=1),  # Output: 3x128x128
             nn.ReLU(),
-            nn.ConvTranspose2d(32, 1, kernel_size=4, stride=2, padding=1),  # Output: 1x256x256
+            nn.ConvTranspose2d(3, 1, kernel_size=4, stride=2, padding=1),  # Output: 1x256x256
             nn.Sigmoid()
         )
 
@@ -70,6 +70,8 @@ class VariationalAutoencoder(nn.Module):
         mu, log_var = self.encode(x)
         z = self.reparameterize(mu, log_var)
         return self.decode(z), mu, log_var
+
+
 
 
 
