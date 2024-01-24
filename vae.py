@@ -110,14 +110,14 @@ transform = transforms.Compose([
 dataset = CustomDataset(folder_path='photos', transform=transform)
 
 # Dataset and Dataloader
-dataloader = DataLoader(dataset, batch_size=400, shuffle=True)
+dataloader = DataLoader(dataset, batch_size=200, shuffle=True)
 
 # Instantiate VAE model with latent_dim
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = VariationalAutoencoder(latent_dim=LATENT_DIM).to(device)
 
 # Loss and optimizer
-optimizer = optim.Adam(model.parameters(), lr=0.0001, betas=(0.9, 0.999), eps=1e-8, weight_decay=0.00, amsgrad=False)
+optimizer = optim.Adam(model.parameters(), lr=0.00001, betas=(0.9, 0.999), eps=1e-8, weight_decay=0.00, amsgrad=False)
 
 # Train the model
 num_epochs = 100000
