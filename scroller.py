@@ -92,6 +92,8 @@ def generate_scrolling_images(model, num_images, folder_path, scroll_index, cons
 
             # Modify the latent variable that you want to scroll
             latent_vector[0, scroll_index] = scroll_value.item()
+            latent_vector[0, scroll_index_2] = scroll_value.item()
+            latent_vector[0, scroll_index_3] = scroll_value.item()
 
             # Decode the latent vector
             generated_image = model.decode(latent_vector).cpu()
@@ -111,7 +113,9 @@ vae_model.eval()
 
 # Generate images
 num_generated_images = 500
-scroll_index = 1  # Index of the latent variable to scroll
+scroll_index = 0  # Index of the latent variable to scroll
+scroll_index_2 = 1  # Index of the latent variable to scroll
+scroll_index_3 = 2  # Index of the latent variable to scroll
 constant_values = [0, 0, 0]  # Constants for other latent variables
 generate_scrolling_images(vae_model, num_generated_images, 'generated_photos', scroll_index, constant_values)
 
