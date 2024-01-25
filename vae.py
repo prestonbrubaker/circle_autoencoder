@@ -96,6 +96,19 @@ class CustomDataset(Dataset):
             image = self.transform(image)
         return image
 
+def test_model(model, dataloader, device):
+    model.eval()  # Set the model to evaluation mode
+    mse_loss = nn.MSELoss(reduction='mean')
+    total_mse = 0.0
+    with torch.no_grad():  # No need to track gradients
+        for data in dataloader:
+            img = data.to(device)
+            recon, _, _ = model(img)
+            loss = mse_loss(recon, img)
+            total_mse += loss.item()
+
+    avg_mse = total_mse / len(dataloader)
+    return avg_mse
 
 
 # Load dataset
@@ -112,6 +125,12 @@ dataset = CustomDataset(folder_path='photos_2', transform=transform)
 
 # Dataset and Dataloader
 dataloader = DataLoader(dataset, batch_size=900, shuffle=True)
+
+
+# Dataset and Dataloader for test data
+test_dataset = CustomDataset(folder_path='test_photos', transform=transform)
+test_dataloader = DataLoader(test_dataset, batch_size=1, shuffle=False) 
+
 
 # Instantiate VAE model with latent_dim
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -155,7 +174,10 @@ for epoch in range(num_epochs):
     avg_kld_loss = total_kld_loss / len(dataloader.dataset)
     avg_total_loss = total_loss / len(dataloader.dataset)
 
-    print(f'Epoch [{epoch+1}/{num_epochs}], Avg Total Loss: {avg_total_loss:.6f}, Avg BCE Loss: {avg_bce_loss:.6f}, Avg KLD Loss: {avg_kld_loss:.6f}')
+    avg_mse_test = test_model(model, test_dataloader, device)
+
+
+    print(f'Epoch [{epoch+1}/{num_epochs}], Avg Total Loss: {avg_total_loss:.6f}, Avg BCE Loss: {avg_bce_loss:.6f}, Avg KLD Loss: {avg_kld_loss:.6f}, Test MSE Loss: {avg_mse_test:.6f}')
     
     if epoch % 25 == 0:
         torch.save(model.state_dict(), f'variational_autoencoder.pth')
