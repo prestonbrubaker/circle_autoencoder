@@ -192,6 +192,8 @@ for epoch in range(num_epochs):
 
 
     print(f'Epoch [{epoch+1}/{num_epochs}], Avg Total Loss: {avg_total_loss:.6f}, Avg BCE Loss: {avg_bce_loss:.6f}, Avg KLD Loss: {avg_kld_loss:.6f}, Test MSE Loss: {avg_mse_test:.6f}')
+    with open('model_history.txt', 'a') as file:
+        file.write(f'Epoch: {epoch}, Avg_Total_Loss: {avg_total_loss:.6f}, Avg_BCE_Loss: {avg_bce_loss:.6f}, Avg_KLD_Loss: {avg_kld_loss:.6f}, Test_MSE_Loss: {avg_mse_test:.6f} \n')
     
     if epoch % 25 == 0:
         torch.save(model.state_dict(), f'variational_autoencoder.pth')
