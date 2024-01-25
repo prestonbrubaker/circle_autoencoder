@@ -26,6 +26,6 @@ for i in range(num_images):
     draw.ellipse([left_up_point, right_down_point], outline='black', fill='black')
 
     # Save the image
-    img.save(f'photos/circle_{i+1}.png')
+    img.save(f'photos_2/circle_{i+1}.png')
 
 print(f'{num_images} images saved in photos folder')
