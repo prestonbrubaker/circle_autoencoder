@@ -110,6 +110,12 @@ def test_model(model, dataloader, device):
     avg_mse = total_mse / len(dataloader)
     return avg_mse
 
+def load_pretrained_model(path, latent_dim, device):
+    model = VariationalAutoencoder(latent_dim=latent_dim).to(device)
+    model.load_state_dict(torch.load(path, map_location=device))
+    return model
+    
+
 
 # Load dataset
 
@@ -135,7 +141,15 @@ test_dataloader = DataLoader(test_dataset, batch_size=1, shuffle=False)
 # Instantiate VAE model with latent_dim
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print("Using: " + str(device))
-model = VariationalAutoencoder(latent_dim=LATENT_DIM).to(device)
+
+saved_model_path = 'variational_autoencoder.pth'
+if os.path.exists(saved_model_path):
+    model = load_pretrained_model(saved_model_path, LATENT_DIM, device)
+    print("Loaded pretrained model.")
+else:
+    model = VariationalAutoencoder(latent_dim=LATENT_DIM).to(device)
+    print("No pretrained model found. Starting from scratch.")
+
 
 # Loss and optimizer
 #optimizer = optim.Adadelta(model.parameters(), lr=0.00001, betas=(0.9, 0.999), eps=1e-8, weight_decay=0.00, amsgrad=False)
