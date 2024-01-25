@@ -74,7 +74,8 @@ class VariationalAutoencoder(nn.Module):
 def loss_function(recon_x, x, mu, log_var):
     BCE = nn.functional.binary_cross_entropy(recon_x, x, reduction='sum')
     KLD = -0.5 * torch.sum(1 + log_var - mu.pow(2) - log_var.exp())
-    return BCE + KLD
+    total_loss = BCE + KLD
+    return BCE, KLD, total_loss
 
 
 
@@ -125,6 +126,10 @@ optimizer = optim.SGD(model.parameters(), lr=0.0001, momentum=0.9)
 # Train the model
 num_epochs = 100000
 for epoch in range(num_epochs):
+    total_bce_loss = 0
+    total_kld_loss = 0
+    total_loss = 0
+
     for data in dataloader:
         img = data.to(device)
 
@@ -132,7 +137,12 @@ for epoch in range(num_epochs):
         recon_batch, mu, log_var = model(img)
 
         # Calculate loss
-        loss = loss_function(recon_batch, img, mu, log_var)
+        BCE_loss, KLD_loss, loss = loss_function(recon_batch, img, mu, log_var)
+
+        # Accumulate losses for averaging
+        total_bce_loss += BCE_loss.item()
+        total_kld_loss += KLD_loss.item()
+        total_loss += loss.item()
 
         # Backward pass and optimize
         optimizer.zero_grad()
@@ -140,7 +150,13 @@ for epoch in range(num_epochs):
         torch.nn.utils.clip_grad_value_(model.parameters(), clip_value=0.5)
         optimizer.step()
 
-    print(f'Epoch [{epoch}/{num_epochs}], Loss: {loss.item():.6f}')
+    # Average losses over the dataset
+    avg_bce_loss = total_bce_loss / len(dataloader.dataset)
+    avg_kld_loss = total_kld_loss / len(dataloader.dataset)
+    avg_total_loss = total_loss / len(dataloader.dataset)
+
+    print(f'Epoch [{epoch+1}/{num_epochs}], Avg Total Loss: {avg_total_loss:.6f}, Avg BCE Loss: {avg_bce_loss:.6f}, Avg KLD Loss: {avg_kld_loss:.6f}')
+    
     if epoch % 25 == 0:
         torch.save(model.state_dict(), f'variational_autoencoder.pth')
         print("Model Saved at Epoch: ", epoch)
