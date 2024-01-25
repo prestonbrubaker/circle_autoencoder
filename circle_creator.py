@@ -7,7 +7,7 @@ image_size = (256, 256)
 
 
 # Number of images to generate
-num_images = 1000
+num_images = 5000
 
 for i in range(num_images):
     # Create a new image with white background
