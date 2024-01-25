@@ -140,8 +140,8 @@ for epoch in range(num_epochs):
         torch.nn.utils.clip_grad_value_(model.parameters(), clip_value=0.5)
         optimizer.step()
 
+    print(f'Epoch [{epoch}/{num_epochs}], Loss: {loss.item():.6f}')
     if epoch % 25 == 0:
-        print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.6f}')
         torch.save(model.state_dict(), f'variational_autoencoder.pth')
         print("Model Saved at Epoch: ", epoch)
 
